@@ -1,4 +1,4 @@
-# java8中的Streams处理系列之一
+# java8中Streams处理系列之一
 
 
 
@@ -79,7 +79,7 @@ for(Transaction t: groceryTransactions){
 List<Integer> transactionsIds = 
     transactions.stream()
                 .filter(t -> t.getType() == Transaction.GROCERY)
-                .sorted(comparing(Transaction::getValue).reversed())
+.sorted(comparing(Transaction::getValue).reversed())
                 .map(Transaction::getId)
                 .collect(toList());
 ```
@@ -174,7 +174,7 @@ List<Integer> transactionsIds =
 
 
 
-具体代码示例不在列举
+具体代码示例不再列举
 
 
 
@@ -182,12 +182,145 @@ List<Integer> transactionsIds =
 
 各种操作可大致分为2类
 
-- filter，sorted ，map：这些可以被链接在一起可以组成pipeline
-- colelct：结束pipeline并且返回一个结果
+#### Intermediate operations(中间操作)
+
+stream中可以被连接在一起的操作称为中间操作，之所以能够连接在一起是以为他们的返回值都是steam。
+
+filter，sorted ，map：这些可以被链接在一起可以组成pipeline
+
+#### Terminal operations（结束操作）
+
+关闭pipleline生成最终结果的操作，最终结果一般都不是steam
 
 
 
-后续待处理
+### 总结stream使用时3个步骤
+
+- 用来执行query的源数据
+- 用来组装pipeline的中间操作
+- 用来执行pipeline并且产生结果的结束操作
+
+### 具体使用示例
+
+#### 过滤filtering
+
+- filter(Predicate) 
+- distinct 
+- limit(n)
+- skip(n)
+
+#### 发现和匹配finding and matching（terminal operations）
+
+常见的数据处理是判断某些元素是不是满足指定的属性
+
+- findFirst：返回结果都是Optional对象
+
+- findAny：返回结果都是Optional对象
+
+  
+
+- anyMatch：判断stream中元素是否满足给定的predicate
+
+- allMatch
+
+- noneMatch
+
+#### 映射mapping
+
+- map ：接收Function类型参数，目的是将元素转换成另一种类型。指定的Function作用于每一个元素，转换为另一种新元素
+
+### Reducing
+
+目前为止，我们使用的terminal operations都是要么返回boolean要么干活void要么是object。我们也可以使用collect来将stream中的元素组装成一个list
+
+- reduce ：对于每一个元素重复的应用某一个操作，直到结果产生。这在函数编程中通常也被叫作fold 操作。
+
+```
+It’s often called a fold operation in functional programming because you can view this operation as “folding” repeatedly a long piece of paper (your stream) until it forms one little square, which is the result of the fold operation.
+
+这里因为原文描述的特别形象，因此直接拿过来贴在这里
+译文：这在函数编程中又被叫做折叠操作 ，打个比喻就好比你重复的折叠一长条纸（类似你的stream）直到它变成你想要的一个小方块，这就是折叠之后的结果。
+
+```
+
+
+
+场景：找出交易流水号最大的id？计算交易值的sum值？
+
+```java
+
+// 使用reduce实现
+int product = numbers.stream().reduce(1,(a,b)->a*b);
+int product = numbers.stream().reduce(1,Integer::Max());
+```
+
+#### 数值型streams
+
+对于数值类型来说可以使用reduce方式进行计算，但是会出现大量的装箱操作，如果能使用sum方式是不是会更好的呢？
+
+```java
+int statement = 
+    transactions.stream()
+                .map(Transaction::getValue)
+                .sum(); // error since Stream has no sum method
+```
+
+
+
+java8中针对基本类型专门定义了几种stream，IntStream，LongStream，DoubleStream，他们分别专门针对于元素为int，long和double的stream。
+
+将一种流转变成另一程特殊的流，最可能常用的方法为mapToInt，mapToLong，mapToDouble。这些方法和之前使用的map是一致的，只是此处返回的是特定的stream而map返回的是stram<T>类型
+
+
+
+最后，还有一种比较常用的方法叫做，数值范围。IntStram，LongStream、DoubleStream提供了2个静态方法，range和rangeClosed
+
+range是开区间，rangeColsed是闭区间
+
+
+
+#### 创建stream(building streams)
+
+创建stream有很多中方式。前面已经说过从collectiong中获取stream的方式。同样的你也可以从数组文件中生成stream。
+
+文件生活曾stream
+
+```java
+long numberOfLines = 
+    Files.lines(Paths.get(“yourFile.txt”), Charset.defaultCharset())
+         .count();
+```
+
+
+
+另外也可以生成无穷大stream
+
+#### 无穷大streams(infinite stream)
+
+我们可以通过函数窗创建无穷大stream，Stream.iterate Stream.generate方法，因为元素是按需被计算出来的，因此能够持续生成元素，这样的stream没有固定的大小，像前面我们从集合中创建的都是固定长度的流。
+
+```java
+// 所有的10的倍数的元素流
+Stream<Integer> numbers = Stream.iterate(0, n -> n + 10);
+
+// 通过limit将无穷大stream转换为固定场stream
+numbers.limit(5).forEach(System.out::println); // 0, 10, 20, 30, 40
+```
+
+### 总结
+
+java8中发布的stream api使我们可以表述复杂的数据查询过程。通过本文我们知道stream中支持的各种操作：filter，map，reduce 以及iterate，而这些方法可以相互组合来写出更高效的数据处理查询过程。这种新的书写方式和你之前操作集合的方式是大大的不同的。
+
+好处也是显而易见的：
+
+- stream使用懒技术和短路技术俩优化你的查询过程
+- stream能够自动的并行化处理以此来重复利用计算机的多核心架构优势
+
+
+
+下一节，我们将介绍一些更高级的操作，比如flatMap以及collect
+
+别走开，下节更精彩。。。。
 
 
 
@@ -195,17 +328,9 @@ List<Integer> transactionsIds =
 
 
 
+作者：
 
-
-
-
-
-
-
-
-
-
-
+**Raoul-Gabriel Urma** 目前正在剑桥大学攻读计算机博士学位，研究程序语言。另外，他是*Java 8 in Action: Lambdas, Streams and Functional-style Programming*这本书的作者。
 
 
 
