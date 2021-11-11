@@ -14,6 +14,28 @@
 
   ```shell
   thread -n 3
+  
+  等同于使用下面原生命令：
+  // 周到cpu最忙的线程ID
+  top -Hp 8612
+  // 返回8657
+  // 打印线程ID当前的stack
+  printf "%x\n" 8657
+  // 返回2236
+  jstack 8612|grep 2236  -A 30
+  // 根据返回的结果就可以定位到具体错误的代码了
+  "pool-12-thread-1" #157 prio=5 os_prio=0 tid=0x00007f7b80288800 nid=0x2236 waiting on condition [0x00007f7b527b4000]
+     java.lang.Thread.State: WAITING (parking)
+  	at sun.misc.Unsafe.park(Native Method)
+  	- parking to wait for  <0x00000000f7e7a510> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+  	at java.util.concurrent.locks.LockSupport.park(LockSupport.java:175)
+  	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:2039)
+  	at java.util.concurrent.LinkedBlockingQueue.take(LinkedBlockingQueue.java:442)
+  	at java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1074)
+  	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1134)
+  	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+  	at java.lang.Thread.run(Thread.java:748)
+  
   ```
 
 - 找出当前阻塞其他线程的线程
