@@ -1,5 +1,20 @@
 ## arthas常用命令
 
+### 共通基础部分
+
+#### 条件表达式
+
+```
+// 方法执行前进行过滤
+monitor -b -c 5 *.MathGame primeFactors "params[0] <= 2"
+// 方法执行后进行过滤
+monitor -c 5 *.MathGame primeFactors "params[0] <= 2"
+
+
+```
+
+#### OGNL表达式
+
 
 
 ### thread命令
@@ -46,7 +61,38 @@
 
 ### watch命令
 
+方法执行数据观测
+
+#### 可以watch范围
+
+- 返回值
+- 抛出异常
+- 入参
+
+#### 选项说明
+
+| 参数名称            | 参数说明                                          |
+| ------------------- | ------------------------------------------------- |
+| *class-pattern*     | 类名表达式匹配                                    |
+| *method-pattern*    | 方法名表达式匹配                                  |
+| *express*           | 观察表达式，默认值：`{params, target, returnObj}` |
+| *condition-express* | 条件表达式                                        |
+| [b]                 | 在**方法调用之前**观察                            |
+| [e]                 | 在**方法异常之后**观察                            |
+| [s]                 | 在**方法返回之后**观察                            |
+| [f]                 | 在**方法结束之后**(正常返回和异常返回)观察        |
+| [E]                 | 开启正则表达式匹配，默认为通配符匹配              |
+| [x:]                | 指定输出结果的属性遍历深度，默认为 1              |
+
+
+
 ### monitor命令
+
+对匹配 `class-pattern`／`method-pattern`／`condition-express`的类、方法的调用进行监控。
+
+-c 5 : 指定采样周期为5s，默认是120s
+
+-b 选项：指定条件表达式在方法执行前进行筛选
 
 ### sc命令
 
@@ -68,6 +114,10 @@ getstatic com.meizhilab.deepcap.rpasource.consts.GdbCsvColumnTypes GDB_CSV_COLUM
 ```
 
 ### ognl表达式
+
+官方参考文档：https://github.com/alibaba/arthas/issues/11
+
+
 
 非常强大的东西，可以线上执行任意代码，下面先简单看下apache官网的介绍
 
@@ -223,6 +273,7 @@ new int[3] // 给定初始size，初始值都为0
 ### 参考链接
 
 1. [ognl官方手册](https://arthas.aliyun.com/doc/ognl.html)
+1. [活用OGNL表达式](https://arthas.aliyun.com/doc/advanced-use.html)
 2. [apache commons-ognl](https://commons.apache.org/proper/commons-ognl/language-guide.html)
 3. 
 
