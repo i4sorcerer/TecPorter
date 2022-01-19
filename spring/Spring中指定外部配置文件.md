@@ -4,7 +4,7 @@
 
 ## 前情回顾
 
-命令行方式启动jar包并指定外部配置文件的时候，出现mybatis的classpath未找到，从而导致mapper.xml未被加载，从而导致项目启动的时候出现下面的错误：*org.apache.ibatis.binding.BindingException: Invalid bound statement (not found)* 
+命令行方式启动jar包并指定外部配置文件的时候，出现mybatis的classpath未找到，从而导致mapper.xml未被加载，导致项目启动的时候出现下面的错误：*org.apache.ibatis.binding.BindingException: Invalid bound statement (not found)* 
 
 使用的启动命令`` java -jar xx.jar --spring.config.location=/config/application.properties --server.port=80``
 
@@ -45,7 +45,7 @@ SERVER_PORT=3344 java -Dserver.port=5566 -jar <path/to/my/jar> --server.port=778
 
 - --server.port=8088 ：spring boot启动时的应用参数等价于在application.properties中的server.port=8088
 
-- -Dserver.port=8088 ：Set a system property 参数-D设置系统属性，系统的环境变量
+- -Dserver.port=8088 ：Set a system property 参数-D设置系统属性
 
 这里有一个巨坑，提醒一下：
 
@@ -70,8 +70,10 @@ SERVER_PORT=3344 java -Dserver.port=5566 -jar <path/to/my/jar> --server.port=778
 - [Spring官方外部配置解释](https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.external-config)
 
 - [Spring Boot启动参数详解](https://www.choupangxia.com/2019/12/22/spring-boot-arguments/)
+
 - [Spring boot修改启动端口的4种方式](https://segmentfault.com/a/1190000023361229)
-- 
+
+  
 
 
 
